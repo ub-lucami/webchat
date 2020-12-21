@@ -1,0 +1,90 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <title>Simple text and voice chat</title>
+        <style>
+                body{
+                   background-color :rgba(100,100,100,0.1);
+                }
+                div{
+                  width : 100%;
+                  height : auto;
+                  float : left;
+                }
+                .message_holder {
+                  margin-bottom : 5px;
+                }
+                .chat_container {
+                  max-width : 300px;
+                  height : 500px;
+                  background-color : white;
+                  overflow: auto;
+                  padding : 5px 5px 0px 5px;
+                }
+                .chat {
+                  padding : 10px;
+                  border: 2px solid #ccc;
+                }
+                .user1{
+                  float : left;
+                  border-radius : 0px 10px 10px 10px;
+                }
+                .user2{
+                  float : right;
+                  border-radius : 10px 0px 10px 10px;
+                }
+        </style>
+  </head>
+  <body>
+
+    <h3 style='color: #ccc;font-size: 30px;'>Basic chat.</h3>
+
+    <form action="" method="POST">
+        <div>
+          <div>
+      <input type="text" class="username" placeholder="User Name"/>
+          </div>
+          <div class="chat_container">
+               <div class="message_holder"></div>
+      </div>
+      <div>
+      <input type="text" class="message" placeholder="Messages"/>
+      <input type="submit"/>
+          </div>
+    </form>
+        </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script type="text/javascript">
+      var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+      socket.on( 'connect', function() {
+        socket.emit( 'my event', {
+          data: 'User Connected'
+        } )
+        var form = $( 'form' ).on( 'submit', function( e ) {
+          e.preventDefault()
+          let user_name = $( 'input.username' ).val()
+          let user_input = $( 'input.message' ).val()
+          socket.emit( 'my event', {
+            user_name : user_name,
+            message : user_input
+          } )
+          $( 'input.message' ).val( '' ).focus()
+        } )
+      } )
+      socket.on( 'my response', function( msg ) {
+        console.log( msg )
+        if( typeof msg.user_name !== 'undefined' ) {
+          $( 'div.message_holder' ).append( '<div><b style="color: #000">'+msg.user_name+'</b> '+msg.message+'</div>' )
+                  var msgspeak = new SpeechSynthesisUtterance();
+                  msgspeak.text = msg.message;
+                  msgspeak.lang = 'en';
+                  window.speechSynthesis.speak(msgspeak);
+        }
+      })
+    </script>
+
+  </body>
+  </html>
